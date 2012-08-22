@@ -21,8 +21,17 @@
       <p class="lead">A sample of the navigation using Google Street View.</p>
       <div class="subnav">
         <ul id="nav-spot" class="nav nav-pills">
-          <li class="active"><a href="https://maps.google.co.jp/maps?q=35.466487,139.620795" target="_blank">Start</a></li>
-          <li><a href="https://maps.google.co.jp/maps?q=35.293194,139.57146" target="_blank">Destination</a></li>
+          <li>
+            <img src="img/start.png" alt="start" />
+            is Start point.&nbsp;&nbsp;
+          </li>
+          <li>
+            <img src="img/finish.png" alt="distination" />
+            is Distination point. Drag these to set the navigation routes. And then, click&nbsp;&nbsp;
+          </li>
+          <li class="active" id="navigation-start">
+            <a href="javascript:void(0);">Start</a>
+          </li>
         </ul>
       </div>
     </header>
@@ -40,7 +49,7 @@
     </section>
   </div>
 </div>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
 <script src="//maps.google.com/maps/api/js?sensor=false"></script>
 <script src="js/requestAnimationFrame.js"></script>
 <script src="js/map-renderer.js"></script>

@@ -12,14 +12,15 @@ _gSite.mapInit = function() {
   _gSite.directionsService = new google.maps.DirectionsService();
   _gSite.mapCanvas = document.getElementById("map-canvas");
   _gSite.mapPanoramaCanvas = document.getElementById("map-sv-canvas");
-  _gSite.latLng = new google.maps.LatLng(35.466487, 139.620795);
+  _gSite.orgLatLng = new google.maps.LatLng(35.466487, 139.620795);
+  _gSite.distLatLng = new google.maps.LatLng(35.293194, 139.57146);
   _gSite.gMapOptions = {
-    zoom: 15,
-    center: _gSite.latLng,
+    zoom: 10,
+    center: _gSite.orgLatLng,
     mapTypeId: google.maps.MapTypeId.ROADMAP
   };
   _gSite.gPanoramaOptions = {
-    position: _gSite.latLng,
+    position: _gSite.orgLatLng,
     pov: {
       heading: 0,
       pitch: 10,
@@ -27,17 +28,40 @@ _gSite.mapInit = function() {
     }
   };
   _gSite.map = new google.maps.Map(_gSite.mapCanvas, _gSite.gMapOptions);
-  _gSite.pin = new google.maps.Marker({
-    position: _gSite.latLng,
+  _gSite.orgPin = new google.maps.Marker({
+    position: _gSite.orgLatLng,
+    draggable: true,
+    animation: google.maps.Animation.DROP,
+    title: 'Start Point',
+    icon: 'img/start.png',
     map: _gSite.map
   });
-  return _gSite.directionsDisplay.setMap(_gSite.map);
+  _gSite.distPin = new google.maps.Marker({
+    position: _gSite.distLatLng,
+    draggable: true,
+    animation: google.maps.Animation.DROP,
+    title: 'Distination Point',
+    icon: 'img/finish.png',
+    map: _gSite.map
+  });
+  _gSite.directionsDisplay.setMap(_gSite.map);
+  google.maps.event.addListener(_gSite.orgPin, 'dragend', function() {
+    _gSite.orgLatLng = _gSite.orgPin.getPosition();
+    return _gSite.gPanoramaOptions.position = _gSite.orgLatLng;
+  });
+  return google.maps.event.addListener(_gSite.distPin, 'dragend', function() {
+    return _gSite.distLatLng = _gSite.distPin.getPosition();
+  });
 };
 
 _gSite.renderNavigation = function() {
+  _gSite.pin = new google.maps.Marker({
+    position: _gSite.orgLatLng,
+    map: _gSite.map
+  });
   _gSite.directionRequest = {
-    origin: _gSite.latLng.toUrlValue(),
-    destination: "35.293194,139.57146",
+    origin: _gSite.orgLatLng.toUrlValue(),
+    destination: _gSite.distLatLng.toUrlValue(),
     travelMode: google.maps.TravelMode.DRIVING
   };
   _gSite.directionsService.route(_gSite.directionRequest, function(result, status) {
@@ -69,6 +93,7 @@ _gSite.renderNavigation = function() {
           poses = currentPath.toUrlValue().split(",");
           pos = new google.maps.LatLng(poses[0] * 1, poses[1] * 1);
           _gSite.panorama.setPosition(pos);
+          _gSite.map.setCenter(pos);
           _gSite.pin.setPosition(pos);
         }
         _gSite.directionPathIndex += 1;
@@ -86,16 +111,16 @@ _gSite.hideMap = function(callback) {
   return setTimeout(function() {
     google.maps.event.trigger(_gSite.map, 'resize');
     _gSite.map.setZoom(15);
-    _gSite.map.setCenter(_gSite.latLng);
+    _gSite.map.setCenter(_gSite.orgLatLng);
     return callback.call(that_);
   }, 700);
 };
 
 $(function() {
   _gSite.mapInit();
-  setTimeout(function() {
+  $("#navigation-start").on('click', function() {
     return _gSite.hideMap(_gSite.renderNavigation);
-  }, 3000);
+  });
   return $("#map-sv-canvas").hover(function() {
     return _gSite.viewRotation = false;
   }, function() {
